@@ -1,0 +1,17 @@
+.sidebar {
+  height: 100%;
+  position: fixed;
+  z-index: 1030;
+}
+
+.nav-link.active {
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+}
