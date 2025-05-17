@@ -1,0 +1,13 @@
+# filepath: c:\Users\Fernando\Desktop\Proyectos Visual Studio Code\segundo_parcial\frontend\Dockerfile
+FROM node:18
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 4200
+
+CMD ["npm", "start"]
