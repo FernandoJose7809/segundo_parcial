@@ -1,12 +1,12 @@
 # filepath: c:\Users\Fernando\Desktop\Proyectos Visual Studio Code\segundo_parcial\frontend\Dockerfile
 FROM node:18
 
-WORKDIR /app
+WORKDIR /app/frontend
 
-COPY package*.json ./
+COPY frontend/package*.json ./
 RUN npm install
 
-COPY . .
+COPY frontend/ .
 
 EXPOSE 4200
 

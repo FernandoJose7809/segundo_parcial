@@ -1,24 +1,17 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
     container_name: segundo_parcial_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: segundo_parcial
+    env_file: .env
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
     container_name: segundo_parcial_pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+    env_file: .env
     ports:
       - "5050:80"
     depends_on:
@@ -26,25 +19,36 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: .
+      dockerfile: Docker/DockerfileBackend
     container_name: segundo_parcial_backend
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/segundo_parcial
-    ports:
-      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+    env_file: .env
+    command: ["bash", "/app/Docker/entrypoint.sh"]
     depends_on:
       - db
+    ports:
+      - "8000:8000"
+
 
   frontend:
     build:
-      context: ./frontend
+      context: .
+      dockerfile: Docker/DockerfileFrontend
     container_name: segundo_parcial_frontend
-    ports:
-      - "4200:4200" # Mapea el puerto 4200 del contenedor al host
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    working_dir: /app/frontend
+    command: ["sh", "-c", "npm install && npm start"]
     stdin_open: true
     tty: true
+    ports:
+      - "4200:4200"
     depends_on:
       - backend
+
 
 volumes:
   db_data:
