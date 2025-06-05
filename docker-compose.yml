@@ -34,18 +34,16 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: Docker/DockerfileFrontend
+      context: ./frontend
+      dockerfile: ../Docker/DockerfileFrontend
     container_name: segundo_parcial_frontend
     volumes:
-      - ./frontend:/app/frontend
-      - /app/frontend/node_modules
-    working_dir: /app/frontend
-    command: ["sh", "-c", "npm install && npm start"]
-    stdin_open: true
-    tty: true
+      - ./frontend:/app
+      - /app/node_modules
     ports:
       - "4200:4200"
+    stdin_open: true
+    tty: true
     depends_on:
       - backend
 
