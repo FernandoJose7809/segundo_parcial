@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     
     'app.grades',
-    'app.group',
+    'app.prediction',
     'app.quater',
     'app.students',
     'app.subjects',

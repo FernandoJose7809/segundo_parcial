@@ -13,3 +13,7 @@ uritemplate==4.1.1
 django-environ==0.11.2
 
 ## ML requisitos
+
+pandas
+scikit-learn
+joblib

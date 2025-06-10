@@ -10,13 +10,77 @@ type_choices=[
         ('E', 'Examen'),
     ]
 class Quetar(models.Model):
+    queter=models.CharField(max_length=1,choices=[('1','1'),('2','2'),('3','3')])
     description=models.CharField(max_length=255,blank=True,null=True)
     start_date=models.DateField(blank=True,null=True)
     end_date=models.DateField(blank=True,null=True)
     
+    @staticmethod
+    def getQuetar(date):
+        return Quetar.objects.filter(start_date__lte=date, end_date__gte=date).first()
+    
+
+class Notes(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    degreeSubject = models.ForeignKey(DegreeSubject, on_delete=models.CASCADE)
+    quetar = models.ForeignKey(Quetar, on_delete=models.CASCADE)
+    
+    note_Task = models.FloatField(default=0)
+    note_Exam = models.FloatField(default=0)
+    note_Participation = models.FloatField(default=0)
+    note_Attendance = models.FloatField(default=0)
+    note = models.FloatField(default=0)
+
+    def recalculate(self):
+        followups = FollowUp.objects.filter(note=self)
+
+        tipos = {
+            'T': {'total': 0, 'count': 0},
+            'E': {'total': 0, 'count': 0},
+            'P': {'total': 0, 'count': 0},
+            'A': {'total': 0, 'count': 0},
+        }
+
+        for f in followups:
+            if f.type in tipos:
+                tipos[f.type]['total'] += f.note_value
+                tipos[f.type]['count'] += 1
+
+        self.note_Task = tipos['T']['total'] / tipos['T']['count'] if tipos['T']['count'] > 0 else 0
+        self.note_Exam = tipos['E']['total'] / tipos['E']['count'] if tipos['E']['count'] > 0 else 0
+        self.note_Participation = tipos['P']['total'] / tipos['P']['count'] if tipos['P']['count'] > 0 else 0
+        self.note_Attendance = tipos['A']['total'] / tipos['A']['count'] if tipos['A']['count'] > 0 else 0
+
+        self.note = (
+            self.note_Task * 0.15 +
+            self.note_Exam * 0.60 +
+            self.note_Participation * 0.10 +
+            self.note_Attendance * 0.15
+        )
+        self.save()
+
+    @staticmethod
+    def getStudentNotes(student:Student,degreeSubject:DegreeSubject):
+        #Crear una nueva fucion y filtar segun el trimestre que este cursando
+        notes = Notes.objects.filter(student=student,degreeSubject=degreeSubject).first()
+        result= {
+            'note_Task':notes.note_Task,
+            'note_Participation':notes.note_Participation,
+            'note_Exam':notes.note_Exam,
+            'note_Attendance':notes.note_Attendance,
+        }
+        return result
+    
+    
 class FollowUp(models.Model):
     type=models.CharField(max_length=1,choices=type_choices)
-    note=models.DecimalField(max_digits=5,decimal_places=2)
-    student=models.ForeignKey(Student,on_delete=models.SET_NULL,null=True)
+    note_value=models.DecimalField(max_digits=5,decimal_places=2,)
+    student=models.ForeignKey(Student,on_delete=models.SET_NULL,blank=True,null=True)
     degreeSubject=models.ForeignKey(DegreeSubject, on_delete=models.CASCADE)
-    quetar=models.ForeignKey(Quetar,on_delete=models.SET_NULL,null=True)
+    note=models.ForeignKey(Notes,on_delete=models.SET_NULL,null=True,blank=True)
+    date=models.DateField(auto_now_add=True)
+    
+class TareaUrl(models.Model):
+    url=models.URLField(null=True,blank=True)
+    followUp=models.ForeignKey(FollowUp,blank=True,on_delete=models.CASCADE)
+    end_date=models.DateField()

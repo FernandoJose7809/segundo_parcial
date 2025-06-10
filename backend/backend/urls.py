@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,9 +25,12 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     
     path('api/',include('app.grades.urls')),
-    path('api/',include('app.group.urls')),
+    #path('api/',include('app.prediction.urls')),
     path('api/',include('app.quater.urls')),
     path('api/',include('app.students.urls')),
     path('api/',include('app.subjects.urls')),
     path('api/',include('app.teacher.urls')),
+    
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
