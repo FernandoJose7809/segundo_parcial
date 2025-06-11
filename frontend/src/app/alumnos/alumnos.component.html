@@ -1,1 +1,95 @@
-<p>alumnos works</p>
+<div class="container mt-4">
+  <h2>Estudiantes</h2>
+  <div class="mb-3 d-flex gap-2">
+  <button class="btn btn-primary mb-3" (click)="openModal()">Crear estudiante</button>
+  <button class="btn btn-secondary mb-3" (click)="clearCursoFilter()" *ngIf="cursoSeleccionado">
+    Ver todos los estudiantes
+  </button>
+</div>
+  <table class="table table-striped table-bordered" *ngIf="students.length > 0; else noData">
+    <thead class="table-primary">
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Fecha Nac.</th>
+        <th>Género</th>
+        <th>Email</th> <!-- Volver a mostrar el email -->
+        <th>Tel. Estudiante</th>
+        <th>Tel. Padre</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of students">
+        <td>{{ s.first_name }}</td>
+        <td>{{ s.last_name }}</td>
+        <td>{{ s.birthdate }}</td>
+        <td>{{ s.gender }}</td>
+        <td>{{ s.student_email }}</td> <!-- Mostrar email aquí -->
+        <td>{{ s.student_phone }}</td>
+        <td>{{ s.parent_phone }}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" (click)="deleteStudent(s.id!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noData>
+    <p class="text-muted">No hay estudiantes registrados.</p>
+  </ng-template>
+</div>
+
+<!-- Modal para crear estudiante -->
+<div *ngIf="showModal" class="modal">
+  <div class="modal-content" style="max-width: 400px; width: 100%;">
+    <h3 class="mb-3">Crear estudiante</h3>
+    <form (ngSubmit)="createStudent()" #form="ngForm" class="form-grid">
+      <div class="mb-2">
+        <label class="form-label">Nombre:</label>
+        <input class="form-control" [(ngModel)]="newStudent.first_name" name="first_name" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Apellido:</label>
+        <input class="form-control" [(ngModel)]="newStudent.last_name" name="last_name" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Fecha Nacimiento:</label>
+        <input type="date" class="form-control" [(ngModel)]="newStudent.birthdate" name="birthdate" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Género:</label>
+        <select class="form-select" [(ngModel)]="newStudent.gender" name="gender">
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Email:</label>
+        <input type="email" class="form-control" [(ngModel)]="newStudent.student_email" name="student_email" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Tel. Estudiante:</label>
+        <input class="form-control" [(ngModel)]="newStudent.student_phone" name="student_phone" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Tel. Padre:</label>
+        <input class="form-control" [(ngModel)]="newStudent.parent_phone" name="parent_phone" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Dirección:</label>
+        <input class="form-control" [(ngModel)]="newStudent.address" name="address" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Curso:</label>
+        <select class="form-select" [(ngModel)]="selectedCursoId" name="curso" required>
+          <option [ngValue]="null" disabled selected>Selecciona un curso</option>
+          <option *ngFor="let c of cursos" [ngValue]="c.id">{{ c.grade }}</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-success" [disabled]="form.invalid">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<div class="container mt-4">
+  <h2>Materias por Curso</h2>
+  <button class="btn btn-primary mb-3" (click)="openModal()">Agregar relación</button>
+  <table class="table table-striped table-bordered" *ngIf="materiascursos.length > 0; else noData">
+    <thead class="table-primary">
+      <tr>
+        <th>Materia</th>
+        <th>Curso</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let mc of materiascursos">
+        <td>{{ getMateriaName(mc.subject) }}</td>
+        <td>{{ getCursoName(mc.grade) }}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" (click)="deleteMateriaCurso(mc.id!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noData>
+    <p class="text-muted">No hay relaciones registradas.</p>
+  </ng-template>
+</div>
+
+<!-- Modal para agregar relación -->
+<div *ngIf="showModal" class="modal">
+  <div class="modal-content" style="max-width: 400px; width: 100%;">
+    <h3 class="mb-3">Agregar Materia a Curso</h3>
+    <form (ngSubmit)="createMateriaCurso()" #mcForm="ngForm">
+      <div class="mb-2">
+        <label class="form-label">Materia:</label>
+        <select class="form-select" [(ngModel)]="newMateriaCurso.subject" name="subject" required>
+          <option [ngValue]="null" disabled selected>Selecciona una materia</option>
+          <option *ngFor="let m of materias" [ngValue]="m.id">{{ m.name }}</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Curso:</label>
+        <select class="form-select" [(ngModel)]="newMateriaCurso.grade" name="grade" required>
+          <option [ngValue]="null" disabled selected>Selecciona un curso</option>
+          <option *ngFor="let c of cursos" [ngValue]="c.id">{{ c.grade }}</option>
+        </select>
+      </div>
+      <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-success" [disabled]="mcForm.invalid">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

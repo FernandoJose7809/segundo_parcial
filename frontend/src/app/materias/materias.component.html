@@ -1,0 +1,55 @@
+<div class="container mt-4">
+  <h2>Materias</h2>
+  <div class="mb-3 d-flex gap-2">
+    <button class="btn btn-primary" (click)="openModal()">Agregar materia</button>
+    <a class="btn btn-outline-secondary" routerLink="/dashboard/cursos_materias" href="/dashboard/cursos_materias">
+      Ver Materias por Curso
+    </a>
+    <a class="btn btn-outline-secondary" routerLink="/dashboard/materias_profesor" href="/dashboard/materias_profesor">
+      Asignar Materias a Profesores
+    </a>
+  </div>
+
+  <table class="table table-striped table-bordered" *ngIf="materias.length > 0; else noData">
+    <thead class="table-primary">
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of materias">
+        <td>{{ m.name }}</td>
+        <td>{{ m.description }}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" (click)="deleteMateria(m.id!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noData>
+    <p class="text-muted">No hay materias registradas.</p>
+  </ng-template>
+</div>
+
+<!-- Modal para agregar materia -->
+<div *ngIf="showModal" class="modal">
+  <div class="modal-content" style="max-width: 400px; width: 100%;">
+    <h3 class="mb-3">Agregar materia</h3>
+    <form (ngSubmit)="createMateria()" #materiaForm="ngForm">
+      <div class="mb-2">
+        <label class="form-label">Nombre:</label>
+        <input class="form-control" [(ngModel)]="newMateria.name" name="name" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Descripción:</label>
+        <textarea class="form-control" [(ngModel)]="newMateria.description" name="description"></textarea>
+      </div>
+      <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-success" [disabled]="materiaForm.invalid">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

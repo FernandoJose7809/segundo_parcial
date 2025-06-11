@@ -1,0 +1,52 @@
+<div class="container mt-4">
+  <h2>Materias por Profesor</h2>
+  <button class="btn btn-primary mb-3" (click)="openModal()">Agregar relación</button>
+  <table class="table table-striped table-bordered" *ngIf="materiasprofesor.length > 0; else noData">
+    <thead class="table-primary">
+      <tr>
+        <th>Materia</th>
+        <th>Profesor</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let mp of materiasprofesor">
+        <td>{{ getMateriaName(mp.subject) }}</td>
+        <td>{{ getProfesorName(mp.teacher) }}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" (click)="deleteMateriaProfesor(mp.id!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noData>
+    <p class="text-muted">No hay relaciones registradas.</p>
+  </ng-template>
+</div>
+
+<!-- Modal para agregar relación -->
+<div *ngIf="showModal" class="modal">
+  <div class="modal-content" style="max-width: 400px; width: 100%;">
+    <h3 class="mb-3">Agregar Materia a Profesor</h3>
+    <form (ngSubmit)="createMateriaProfesor()" #mpForm="ngForm">
+      <div class="mb-2">
+        <label class="form-label">Materia:</label>
+        <select class="form-select" [(ngModel)]="newMateriaProfesor.subject" name="subject" required>
+          <option [ngValue]="null" disabled selected>Selecciona una materia</option>
+          <option *ngFor="let m of materias" [ngValue]="m.id">{{ m.name }}</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Profesor:</label>
+        <select class="form-select" [(ngModel)]="newMateriaProfesor.teacher" name="teacher" required>
+          <option [ngValue]="null" disabled selected>Selecciona un profesor</option>
+          <option *ngFor="let p of profesores" [ngValue]="p.id">{{ p.first_name }} {{ p.last_name }}</option>
+        </select>
+      </div>
+      <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-success" [disabled]="mpForm.invalid">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

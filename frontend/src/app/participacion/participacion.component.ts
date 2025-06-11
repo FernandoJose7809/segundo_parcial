@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../services/api.service';
 
-interface Tarea {
+interface Participacion {
   id?: number;
   note: number;
   student: number | null;
   degreeSubject: number | null;
   quetar: number | null;
-  type: string; // Siempre "T"
+  type: string; // Siempre "P"
 }
 
 interface Student {
@@ -35,14 +35,14 @@ interface Quetar {
 }
 
 @Component({
-  selector: 'app-tareas',
+  selector: 'app-participacion',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './tareas.component.html',
-  styleUrls: ['./tareas.component.css']
+  templateUrl: './participacion.component.html',
+  styleUrls: ['./participacion.component.css']
 })
-export class TareasComponent {
-  tareas: Tarea[] = [];
+export class ParticipacionComponent {
+  participaciones: Participacion[] = [];
   estudiantes: Student[] = [];
   degreeSubjects: DegreeSubject[] = [];
   subjects: Subject[] = [];
@@ -50,31 +50,31 @@ export class TareasComponent {
   showModal = false;
   editMode = false;
   loading = false;
-  newTarea: Tarea = this.getEmptyTarea();
+  newParticipacion: Participacion = this.getEmptyParticipacion();
 
   constructor(private apiService: ApiService) {
-    this.loadTareas();
+    this.loadParticipaciones();
     this.loadEstudiantes();
     this.loadDegreeSubjects();
     this.loadSubjects();
     this.loadQuetars();
   }
 
-  getEmptyTarea(): Tarea {
+  getEmptyParticipacion(): Participacion {
     return {
       note: 0,
       student: null,
       degreeSubject: null,
       quetar: null,
-      type: 'T'
+      type: 'P'
     };
   }
 
-  loadTareas() {
+  loadParticipaciones() {
     this.loading = true;
     this.apiService.get('TrimestreDelEsudiante/').subscribe({
       next: (data) => {
-        this.tareas = data.filter((t: Tarea) => t.type === 'T');
+        this.participaciones = data.filter((p: Participacion) => p.type === 'P');
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -126,12 +126,12 @@ export class TareasComponent {
     return q ? q.description : '';
   }
 
-  openModal(tarea?: Tarea) {
-    if (tarea) {
-      this.newTarea = { ...tarea };
+  openModal(participacion?: Participacion) {
+    if (participacion) {
+      this.newParticipacion = { ...participacion };
       this.editMode = true;
     } else {
-      this.newTarea = this.getEmptyTarea();
+      this.newParticipacion = this.getEmptyParticipacion();
       this.editMode = false;
     }
     this.showModal = true;
@@ -141,27 +141,27 @@ export class TareasComponent {
     this.showModal = false;
   }
 
-  saveTarea() {
-    if (this.editMode && this.newTarea.id) {
-      this.apiService.put(`TrimestreDelEsudiante/${this.newTarea.id}/`, this.newTarea).subscribe({
+  saveParticipacion() {
+    if (this.editMode && this.newParticipacion.id) {
+      this.apiService.put(`TrimestreDelEsudiante/${this.newParticipacion.id}/`, this.newParticipacion).subscribe({
         next: () => {
-          this.loadTareas();
+          this.loadParticipaciones();
           this.closeModal();
         }
       });
     } else {
-      this.apiService.post('TrimestreDelEsudiante/', this.newTarea).subscribe({
+      this.apiService.post('TrimestreDelEsudiante/', this.newParticipacion).subscribe({
         next: () => {
-          this.loadTareas();
+          this.loadParticipaciones();
           this.closeModal();
         }
       });
     }
   }
 
-  deleteTarea(id: number) {
-    if (confirm('¿Seguro que deseas eliminar esta tarea?')) {
-      this.apiService.delete(`TrimestreDelEsudiante/${id}/`).subscribe(() => this.loadTareas());
+  deleteParticipacion(id: number) {
+    if (confirm('¿Seguro que deseas eliminar esta participación?')) {
+      this.apiService.delete(`TrimestreDelEsudiante/${id}/`).subscribe(() => this.loadParticipaciones());
     }
   }
 }

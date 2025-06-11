@@ -4,7 +4,7 @@ from .views import StudentViewSet
 from .models import Student
 
 pageName = {
-    Student:'Cursos',
+    Student:'Estudiantes',
 }
 
 router=DefaultRouter()

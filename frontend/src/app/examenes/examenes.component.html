@@ -1,7 +1,7 @@
 <div class="container mt-4">
-  <h2>Tareas</h2>
-  <button class="btn btn-primary mb-3" (click)="openModal()">Agregar tarea</button>
-  <table class="table table-striped table-bordered" *ngIf="tareas.length > 0; else noData">
+  <h2>Exámenes</h2>
+  <button class="btn btn-primary mb-3" (click)="openModal()">Agregar examen</button>
+  <table class="table table-striped table-bordered" *ngIf="examenes.length > 0; else noData">
     <thead class="table-primary">
       <tr>
         <th>Estudiante</th>
@@ -12,31 +12,31 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let t of tareas">
-        <td>{{ getStudentName(t.student) }}</td>
-        <td>{{ getSubjectName(t.degreeSubject) }}</td>
-        <td>{{ getQuetarDescription(t.quetar) }}</td>
-        <td>{{ t.note }}</td>
+      <tr *ngFor="let e of examenes">
+        <td>{{ getStudentName(e.student) }}</td>
+        <td>{{ getSubjectName(e.degreeSubject) }}</td>
+        <td>{{ getQuetarDescription(e.quetar) }}</td>
+        <td>{{ e.note }}</td>
         <td>
-          <button class="btn btn-warning btn-sm me-2" (click)="openModal(t)">Editar</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteTarea(t.id!)">Eliminar</button>
+          <button class="btn btn-warning btn-sm me-2" (click)="openModal(e)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteExamen(e.id!)">Eliminar</button>
         </td>
       </tr>
     </tbody>
   </table>
   <ng-template #noData>
-    <p class="text-muted">No hay tareas registradas.</p>
+    <p class="text-muted">No hay exámenes registrados.</p>
   </ng-template>
 </div>
 
-<!-- Modal para agregar/editar tarea -->
+<!-- Modal para agregar/editar examen -->
 <div *ngIf="showModal" class="modal">
   <div class="modal-content" style="max-width: 400px; width: 100%;">
-    <h3 class="mb-3">{{ editMode ? 'Editar' : 'Agregar' }} tarea</h3>
-    <form (ngSubmit)="saveTarea()" #tareaForm="ngForm">
+    <h3 class="mb-3">{{ editMode ? 'Editar' : 'Agregar' }} examen</h3>
+    <form (ngSubmit)="saveExamen()" #examenForm="ngForm">
       <div class="mb-2">
         <label class="form-label">Estudiante:</label>
-        <select class="form-select" [(ngModel)]="newTarea.student" name="student" required>
+        <select class="form-select" [(ngModel)]="newExamen.student" name="student" required>
           <option [ngValue]="null" disabled selected>Selecciona un estudiante</option>
           <option *ngFor="let est of estudiantes" [ngValue]="est.id">
             {{ est.first_name }} {{ est.last_name }}
@@ -45,7 +45,7 @@
       </div>
       <div class="mb-2">
         <label class="form-label">Materia:</label>
-        <select class="form-select" [(ngModel)]="newTarea.degreeSubject" name="degreeSubject" required>
+        <select class="form-select" [(ngModel)]="newExamen.degreeSubject" name="degreeSubject" required>
           <option [ngValue]="null" disabled selected>Selecciona una materia</option>
           <option *ngFor="let ds of degreeSubjects" [ngValue]="ds.id">
             {{ getSubjectName(ds.id) }}
@@ -54,7 +54,7 @@
       </div>
       <div class="mb-2">
         <label class="form-label">Trimestre:</label>
-        <select class="form-select" [(ngModel)]="newTarea.quetar" name="quetar" required>
+        <select class="form-select" [(ngModel)]="newExamen.quetar" name="quetar" required>
           <option [ngValue]="null" disabled selected>Selecciona un trimestre</option>
           <option *ngFor="let q of quetars" [ngValue]="q.id">
             {{ q.description }}
@@ -63,10 +63,10 @@
       </div>
       <div class="mb-2">
         <label class="form-label">Nota:</label>
-        <input class="form-control" type="number" [(ngModel)]="newTarea.note" name="note" required />
+        <input class="form-control" type="number" [(ngModel)]="newExamen.note" name="note" required />
       </div>
       <div class="d-flex justify-content-between mt-3">
-        <button type="submit" class="btn btn-success" [disabled]="tareaForm.invalid">Guardar</button>
+        <button type="submit" class="btn btn-success" [disabled]="examenForm.invalid">Guardar</button>
         <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
       </div>
     </form>

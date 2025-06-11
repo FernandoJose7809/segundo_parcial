@@ -1,25 +1,33 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { ApiService } from '../services/api.service';
+import { FormsModule } from '@angular/forms'; // <-- Agrega esto
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule], // Importa FormsModule aquí
+  imports: [FormsModule], // <-- Agrega esto
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  email: string = '';
+  username: string = ''; // Cambia 'email' por 'username'
   password: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private apiService: ApiService) {}
 
   login() {
-    if (this.email === 'admin' && this.password === 'admin123') {
-      this.router.navigate(['/dashboard']); // Redirige al dashboard
-    } else {
-      alert('Credenciales incorrectas');
-    }
+    const loginData = { username: this.username, password: this.password }; // Usa 'username'
+
+    this.apiService.post('token/', loginData).subscribe(
+      (response: any) => {
+        localStorage.setItem('access_token', response.access);
+        localStorage.setItem('refresh_token', response.refresh);
+        this.router.navigate(['/dashboard']);
+      },
+      (error) => {
+        alert('Credenciales incorrectas');
+      }
+    );
   }
 }

@@ -1,0 +1,52 @@
+<div class="container mt-4">
+  <h2>Trimestres</h2>
+  <button class="btn btn-primary mb-3" (click)="openModal()">Agregar trimestre</button>
+  <table class="table table-striped table-bordered" *ngIf="trimestres.length > 0; else noData">
+    <thead class="table-primary">
+      <tr>
+        <th>Descripción</th>
+        <th>Fecha Inicio</th>
+        <th>Fecha Fin</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of trimestres">
+        <td>{{ t.description }}</td>
+        <td>{{ t.start_date || '-' }}</td>
+        <td>{{ t.end_date || '-' }}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" (click)="deleteTrimestre(t.id!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noData>
+    <p class="text-muted">No hay trimestres registrados.</p>
+  </ng-template>
+</div>
+
+<!-- Modal para agregar trimestre -->
+<div *ngIf="showModal" class="modal">
+  <div class="modal-content" style="max-width: 400px; width: 100%;">
+    <h3 class="mb-3">Agregar trimestre</h3>
+    <form (ngSubmit)="createTrimestre()" #trimestreForm="ngForm">
+      <div class="mb-2">
+        <label class="form-label">Descripción:</label>
+        <input class="form-control" [(ngModel)]="newTrimestre.description" name="description" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Fecha Inicio:</label>
+        <input class="form-control" type="date" [(ngModel)]="newTrimestre.start_date" name="start_date" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Fecha Fin:</label>
+        <input class="form-control" type="date" [(ngModel)]="newTrimestre.end_date" name="end_date" />
+      </div>
+      <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-success" [disabled]="trimestreForm.invalid">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

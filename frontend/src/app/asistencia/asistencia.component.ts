@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../services/api.service';
 
-interface Tarea {
+interface Asistencia {
   id?: number;
   note: number;
   student: number | null;
   degreeSubject: number | null;
   quetar: number | null;
-  type: string; // Siempre "T"
+  type: string; // Siempre "A"
 }
 
 interface Student {
@@ -22,6 +22,7 @@ interface DegreeSubject {
   id: number;
   subject: number | null;
   grade: number | null;
+  // Puedes agregar más campos si tu API los retorna
 }
 
 interface Subject {
@@ -35,14 +36,14 @@ interface Quetar {
 }
 
 @Component({
-  selector: 'app-tareas',
+  selector: 'app-asistencia',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './tareas.component.html',
-  styleUrls: ['./tareas.component.css']
+  templateUrl: './asistencia.component.html',
+  styleUrls: ['./asistencia.component.css']
 })
-export class TareasComponent {
-  tareas: Tarea[] = [];
+export class AsistenciaComponent {
+  asistencias: Asistencia[] = [];
   estudiantes: Student[] = [];
   degreeSubjects: DegreeSubject[] = [];
   subjects: Subject[] = [];
@@ -50,31 +51,32 @@ export class TareasComponent {
   showModal = false;
   editMode = false;
   loading = false;
-  newTarea: Tarea = this.getEmptyTarea();
+  newAsistencia: Asistencia = this.getEmptyAsistencia();
 
   constructor(private apiService: ApiService) {
-    this.loadTareas();
+    this.loadAsistencias();
     this.loadEstudiantes();
     this.loadDegreeSubjects();
     this.loadSubjects();
     this.loadQuetars();
   }
 
-  getEmptyTarea(): Tarea {
+  getEmptyAsistencia(): Asistencia {
     return {
       note: 0,
       student: null,
       degreeSubject: null,
       quetar: null,
-      type: 'T'
+      type: 'A'
     };
   }
 
-  loadTareas() {
+  loadAsistencias() {
     this.loading = true;
     this.apiService.get('TrimestreDelEsudiante/').subscribe({
       next: (data) => {
-        this.tareas = data.filter((t: Tarea) => t.type === 'T');
+        // Filtra solo asistencias
+        this.asistencias = data.filter((a: Asistencia) => a.type === 'A');
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -109,9 +111,43 @@ export class TareasComponent {
     });
   }
 
-  getStudentName(id: number | null) {
-    const est = this.estudiantes.find(e => e.id === id);
-    return est ? `${est.first_name} ${est.last_name}` : '';
+  openModal(asistencia?: Asistencia) {
+    if (asistencia) {
+      this.newAsistencia = { ...asistencia };
+      this.editMode = true;
+    } else {
+      this.newAsistencia = this.getEmptyAsistencia();
+      this.editMode = false;
+    }
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+  }
+
+  saveAsistencia() {
+    if (this.editMode && this.newAsistencia.id) {
+      this.apiService.put(`TrimestreDelEsudiante/${this.newAsistencia.id}/`, this.newAsistencia).subscribe({
+        next: () => {
+          this.loadAsistencias();
+          this.closeModal();
+        }
+      });
+    } else {
+      this.apiService.post('TrimestreDelEsudiante/', this.newAsistencia).subscribe({
+        next: () => {
+          this.loadAsistencias();
+          this.closeModal();
+        }
+      });
+    }
+  }
+
+  deleteAsistencia(id: number) {
+    if (confirm('¿Seguro que deseas eliminar esta asistencia?')) {
+      this.apiService.delete(`TrimestreDelEsudiante/${id}/`).subscribe(() => this.loadAsistencias());
+    }
   }
 
   getSubjectName(degreeSubjectId: number | null) {
@@ -124,44 +160,5 @@ export class TareasComponent {
   getQuetarDescription(quetarId: number | null) {
     const q = this.quetars.find(qt => qt.id === quetarId);
     return q ? q.description : '';
-  }
-
-  openModal(tarea?: Tarea) {
-    if (tarea) {
-      this.newTarea = { ...tarea };
-      this.editMode = true;
-    } else {
-      this.newTarea = this.getEmptyTarea();
-      this.editMode = false;
-    }
-    this.showModal = true;
-  }
-
-  closeModal() {
-    this.showModal = false;
-  }
-
-  saveTarea() {
-    if (this.editMode && this.newTarea.id) {
-      this.apiService.put(`TrimestreDelEsudiante/${this.newTarea.id}/`, this.newTarea).subscribe({
-        next: () => {
-          this.loadTareas();
-          this.closeModal();
-        }
-      });
-    } else {
-      this.apiService.post('TrimestreDelEsudiante/', this.newTarea).subscribe({
-        next: () => {
-          this.loadTareas();
-          this.closeModal();
-        }
-      });
-    }
-  }
-
-  deleteTarea(id: number) {
-    if (confirm('¿Seguro que deseas eliminar esta tarea?')) {
-      this.apiService.delete(`TrimestreDelEsudiante/${id}/`).subscribe(() => this.loadTareas());
-    }
   }
 }
