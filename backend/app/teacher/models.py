@@ -10,13 +10,14 @@ class Teacher(models.Model):
         ('M', 'Masculino'),
         ('F','Femenino'),
     ]
+    ci = models.IntegerField()
     first_name=models.CharField(max_length=30)
     last_name=models.CharField(max_length=30)
     birthdate=models.DateField()
     gender=models.CharField(max_length=1,choices=gener_choices)
     address = models.CharField(max_length=100, null=True, blank=True)
     phone=models.CharField(max_length=15)
-    email=models.EmailField()
+    email=models.EmailField(unique=True)
     user=models.ForeignKey(User,related_name='teacher',
                            on_delete=models.SET_NULL,blank=True,null=True)
     created_year = models.IntegerField(default=datetime.now().year)

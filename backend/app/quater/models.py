@@ -26,7 +26,7 @@ class Quetar(models.Model):
 
 class Notes(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    degreeSubject = models.ForeignKey(DegreeSubject, on_delete=models.CASCADE)
+    degreeSubject = models.ForeignKey('grades.DegreeSubject', on_delete=models.CASCADE)
     quetar = models.ForeignKey(Quetar, on_delete=models.CASCADE)
     
     note_Task = models.FloatField(default=0)
@@ -64,8 +64,7 @@ class Notes(models.Model):
         self.save()
 
     @staticmethod
-    def getStudentNotes(student:Student,degreeSubject:DegreeSubject):
-        #Crear una nueva fucion y filtar segun el trimestre que este cursando
+    def getStudentNotes(student,degreeSubject):
         notes = Notes.objects.filter(student=student,degreeSubject=degreeSubject).first()
         result= {
             'note_Task':notes.note_Task,
@@ -78,7 +77,7 @@ class Notes(models.Model):
     
 class FollowUp(models.Model):
     type=models.CharField(max_length=1,choices=type_choices)
-    note_value=models.DecimalField(max_digits=5,decimal_places=2,)
+    note_value=models.DecimalField(max_digits=5,decimal_places=2,default=0)
     student=models.ForeignKey(Student,on_delete=models.SET_NULL,blank=True,null=True)
     degreeSubject=models.ForeignKey(DegreeSubject, on_delete=models.CASCADE)
     quetar=models.ForeignKey(Quetar,on_delete=models.SET_NULL,null=True)

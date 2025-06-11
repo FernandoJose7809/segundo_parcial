@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     
     path('api/',include('app.grades.urls')),
-    #path('api/',include('app.prediction.urls')),
+    path('api/',include('app.prediction.urls')),
     path('api/',include('app.quater.urls')),
     path('api/',include('app.students.urls')),
     path('api/',include('app.subjects.urls')),
