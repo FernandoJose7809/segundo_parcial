@@ -1,7 +1,7 @@
 # app/courses/views.py
 from rest_framework import viewsets
-from .models import Grade, StudentCourse, DegreeSubject
-from .serializers import GradeSerializer, StudentCourseSerializer, DegreeSubjectSerializer
+from .models import Grade, StudentCourse, DegreeSubject, GroupTeacher
+from .serializers import GradeSerializer, StudentCourseSerializer, DegreeSubjectSerializer, GroupTeacherSerializer
 
 class GradeViewSet(viewsets.ModelViewSet):
     queryset = Grade.objects.all()
@@ -14,3 +14,7 @@ class StudentCourseViewSet(viewsets.ModelViewSet):
 class DegreeSubjectViewSet(viewsets.ModelViewSet):
     queryset = DegreeSubject.objects.all()
     serializer_class = DegreeSubjectSerializer
+
+class GroupTeacherViewSet(viewsets.ModelViewSet):
+    queryset = GroupTeacher.objects.all()
+    serializer_class = GroupTeacherSerializer
