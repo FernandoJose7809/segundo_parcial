@@ -4,19 +4,21 @@ from rest_framework.response import Response
 from .models import Quetar, FollowUp, TareaUrl, Notes
 from .serializers import QuetarSerializer, FollowUpSerializer, TareaUrlSerializer, NotesSerializer
 from app.grades.models import StudentCourse, DegreeSubject
-from app.teacher.permissions import IsTeacher
 from datetime import date
 
-# Create your views here.
+# #!Eliminar
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
+# #!Eliminar
 
+# Create your views here...
 class QuetarViewSet(viewsets.ModelViewSet):
     queryset = Quetar.objects.all()
     serializer_class = QuetarSerializer
-
+    
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        quetar = self.get_object()
-
+        quetar = self.serializer_class.Meta.model.objects.get(pk=response.data['id'])
         for degreeSubject in DegreeSubject.objects.all():
             student_courses = StudentCourse.objects.filter(grade=degreeSubject.grade)
             for sc in student_courses:
@@ -26,12 +28,27 @@ class QuetarViewSet(viewsets.ModelViewSet):
                     quetar=quetar
                 )
         return response
+    
+# #!ELINAR 
+# @receiver(post_save, sender=Quetar)
+# def crear_notes_automaticamente(sender, instance, created, **kwargs):
+#     if created:
+#         print("Se creó un Quarter desde cualquier lugar")
+#         for degreeSubject in DegreeSubject.objects.all():
+#             student_courses = StudentCourse.objects.filter(grade=degreeSubject.grade)
+#             for sc in student_courses:
+#                 Notes.objects.get_or_create(
+#                     student=sc.student,
+#                     degreeSubject=degreeSubject,
+#                     quetar=instance
+#                 )
+# #!ELINAR
 
 
 class FollowUpViewSet(viewsets.ModelViewSet):
     #queryset = FollowUp.objects.all()
     serializer_class = FollowUpSerializer
-    permission_classes = [IsTeacher]
+    #permission_classes = [IsTeacher]
     
     def create(self, request, *args, **kwargs):
         t = request.data.get('type')
@@ -92,14 +109,8 @@ class FollowUpViewSet(viewsets.ModelViewSet):
         instance = serializer.save()
         instance.note.recalculate()
         instance.degreeSubject.recalculate()
-        
-
-
-        
-        
-
-            
-        
+              
+                 
 class TareaUrlViewSet(viewsets.ModelViewSet):
     queryset = TareaUrl.objects.all()
     serializer_class = TareaUrlSerializer

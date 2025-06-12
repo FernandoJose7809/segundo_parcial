@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from app.quater.models import Notes
 from app.students.permissions import IsStudent
 from rest_framework.permissions import IsAuthenticated
+from app.grades.models import DegreeSubject
 from .predictor import Prediccion
 # Create your views here.
 

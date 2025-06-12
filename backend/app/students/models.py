@@ -15,7 +15,6 @@ class Student(models.Model):
     gender=models.CharField(max_length=1,choices=gener_choices)
     address = models.CharField(max_length=100, null=True, blank=True)
     student_phone=models.CharField(max_length=15,blank=True,null=True)
-    parent_phone=models.CharField(max_length=15)
     student_email=models.EmailField(unique=True)
     user=models.ForeignKey(User,related_name='student',
                            on_delete=models.SET_NULL,blank=True,null=True)
@@ -32,3 +31,15 @@ class Student(models.Model):
                 return int(course.grade.grade) 
         return None
     
+    
+class Tutor(models.Model):
+    ci = models.IntegerField()
+    first_name=models.CharField(max_length=30)
+    last_name=models.CharField(max_length=30)
+    rol=models.CharField(max_length=1,choices=[('F','Padre'),('M','Madre'),('O','Otro')])
+    address = models.CharField(max_length=100, null=True, blank=True)
+    tutor_email=models.EmailField(unique=True)
+    user=models.ForeignKey(User,related_name='tutor',
+                           on_delete=models.SET_NULL,blank=True,null=True)
+    created_year = models.IntegerField(default=datetime.now().year)
+    student = models.ForeignKey(Student,on_delete=models.CASCADE)

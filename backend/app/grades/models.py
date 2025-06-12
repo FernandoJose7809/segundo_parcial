@@ -11,9 +11,9 @@ class Grade(models.Model):
     grade = models.CharField(max_length=1)
     acronym = models.CharField(max_length=2)
     average_annual_grade = models.DecimalField(max_digits=5, decimal_places=2,
-                                             null=True, blank=True)
+                                             null=True, blank=True, default=0)
     average_annual_attendance = models.DecimalField(max_digits=5, decimal_places=2,
-                                                  null=True, blank=True)
+                                                  null=True, blank=True, default=0)
     
     def __str__(self):
         return f"{self.grade} - {self.year}"
@@ -71,6 +71,7 @@ class DegreeSubject(models.Model):
             self.average_exam = avg_exam / count
             self.average_Note = avg_note / count
             self.save()
+
 
         
         
