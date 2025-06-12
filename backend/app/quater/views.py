@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .models import Quetar, FollowUp, TareaUrl, Notes
 from .serializers import QuetarSerializer, FollowUpSerializer, TareaUrlSerializer, NotesSerializer
 from app.grades.models import StudentCourse, DegreeSubject
+from app.teacher.permissions import IsTeacher
 from datetime import date
 
 # #!Eliminar
@@ -48,7 +49,7 @@ class QuetarViewSet(viewsets.ModelViewSet):
 class FollowUpViewSet(viewsets.ModelViewSet):
     #queryset = FollowUp.objects.all()
     serializer_class = FollowUpSerializer
-    #permission_classes = [IsTeacher]
+    permission_classes = [IsTeacher]
     
     def create(self, request, *args, **kwargs):
         t = request.data.get('type')
