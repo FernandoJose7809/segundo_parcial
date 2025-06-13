@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from .models import Teacher
 
 @receiver(post_save, sender=Teacher)
-def create_user_for_student(sender, instance, created, **kwargs):
+def create_user_for_teacher(sender, instance, created, **kwargs):
     if created and instance.user is None:
         username = f"{instance.last_name[0].upper()}.{instance.ci}"
         base_username = username
