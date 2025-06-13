@@ -12,7 +12,7 @@ PyYAML==6.0.2
 uritemplate==4.1.1
 django-environ==0.11.2
 logger
-
+Faker
 ## ML requisitos
 
 pandas

@@ -9,7 +9,11 @@ from .predictor import Prediccion
 # Create your views here.
 
 class PrediccionView(APIView):
+<<<<<<< HEAD
+    permission_classes = [IsStudent]
+=======
     permission_classes =  [IsStudent]
+>>>>>>> 1f72c9561e5ca7c954b7c6b755493b94fdbc4b9f
     
     def post(self, request):
         student = request.user.student

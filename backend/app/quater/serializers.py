@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Quetar, Notes, Task, Attendance, Exam,Participation #,FollowUp
-from app.students.models import Student
 from app.grades.models import DegreeSubject
 
 class QuetarSerializer(serializers.ModelSerializer):
