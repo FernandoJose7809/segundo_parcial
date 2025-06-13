@@ -1,8 +1,6 @@
 from django.db import models
 from app.students.models import Student
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-from django.db.models import Avg
+
 
 # Create your models here.
 type_choices=[
