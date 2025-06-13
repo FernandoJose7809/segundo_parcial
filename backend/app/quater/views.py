@@ -49,7 +49,7 @@ class QuetarViewSet(viewsets.ModelViewSet):
 class FollowUpViewSet(viewsets.ModelViewSet):
     #queryset = FollowUp.objects.all()
     serializer_class = FollowUpSerializer
-    permission_classes = [IsTeacher]
+    #permission_classes = [IsTeacher]
     
     def create(self, request, *args, **kwargs):
         t = request.data.get('type')
