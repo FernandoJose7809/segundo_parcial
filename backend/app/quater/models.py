@@ -33,34 +33,6 @@ class Notes(models.Model):
     note_Attendance = models.FloatField(default=0)
     note = models.FloatField(default=0)
 
-    def recalculate(self):
-        followups = FollowUp.objects.filter(note=self)
-
-        tipos = {
-            'T': {'total': 0, 'count': 0},
-            'E': {'total': 0, 'count': 0},
-            'P': {'total': 0, 'count': 0},
-            'A': {'total': 0, 'count': 0},
-        }
-
-        for f in followups:
-            if f.type in tipos:
-                tipos[f.type]['total'] += f.note_value
-                tipos[f.type]['count'] += 1
-
-        self.note_Task = tipos['T']['total'] / tipos['T']['count'] if tipos['T']['count'] > 0 else 0
-        self.note_Exam = tipos['E']['total'] / tipos['E']['count'] if tipos['E']['count'] > 0 else 0
-        self.note_Participation = tipos['P']['total'] / tipos['P']['count'] if tipos['P']['count'] > 0 else 0
-        self.note_Attendance = tipos['A']['total'] / tipos['A']['count'] if tipos['A']['count'] > 0 else 0
-
-        self.note = (
-            self.note_Task * 0.15 +
-            self.note_Exam * 0.60 +
-            self.note_Participation * 0.10 +
-            self.note_Attendance * 0.15
-        )
-        self.save()
-
     @staticmethod
     def getStudentNotes(student,degreeSubject):
         notes = Notes.objects.filter(student=student,degreeSubject=degreeSubject).first()
@@ -115,6 +87,7 @@ class Task(models.Model):
     #degreeSubject=models.ForeignKey('grades.DegreeSubject', on_delete=models.CASCADE)
     start_date = models.DateField(auto_now_add=True)
     note= models.ForeignKey(Notes,on_delete=models.CASCADE, blank=True, null=True)
+    url = models.URLField(blank=True,null=True)
     end_date = models.DateField()
 
 class Participation(models.Model):
@@ -132,6 +105,6 @@ class Exam(models.Model):
     
     
         
-class TareaUrl(models.Model):
-    url = models.URLField(blank=True,null=True)
-    task = models.ForeignKey(Task,on_delete=models.CASCADE)
+# class TareaUrl(models.Model):
+#     url = models.URLField(blank=True,null=True)
+#     task = models.ForeignKey(Task,on_delete=models.CASCADE)

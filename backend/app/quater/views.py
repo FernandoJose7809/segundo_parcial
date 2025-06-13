@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets,status
 from rest_framework.response import Response
-from .models import Quetar, TareaUrl, Notes, Attendance
-from .serializers import QuetarSerializer, TareaUrlSerializer, NotesSerializer, AttendanceSerializer
+from .models import Quetar, Notes, Attendance,Task, Exam, Participation
+from .serializers import QuetarSerializer, NotesSerializer, AttendanceSerializer,TaskSerializer, ExamSerializer,ParticipationSerializer
 from app.grades.models import StudentCourse, DegreeSubject
 from app.teacher.permissions import IsTeacher
 from datetime import date
@@ -111,19 +111,163 @@ class QuetarViewSet(viewsets.ModelViewSet):
 #         instance.degreeSubject.recalculate()
 
 
+
 class AttendanceViewSet(viewsets.ModelViewSet):
-    serializer_class = TareaUrlSerializer
-          
-# @receiver(post_save, sender=Attendance)        
-# def automaticamente(sender, instance, created, **kwargs):
-#     if created:
+    serializer_class = AttendanceSerializer
+    queryset = Attendance.objects.all()
+
+    def perform_create(self, serializer):
+        degree_subject = self.request.data.get('degreeSubject')
+        if not degree_subject:
+            raise serializers.ValidationError("Debe enviar degreeSubject")
+
+        try:
+            ds = DegreeSubject.objects.get(id=degree_subject)
+        except DegreeSubject.DoesNotExist:
+            raise serializers.ValidationError("DegreeSubject inválido")
+
+        quetar = Quetar.getQuetar()
+        note = Notes.objects.filter(degreeSubject=ds, quetar=quetar).first()
+        if not note:
+            raise serializers.ValidationError("No se encontró Note para esa combinación")
+
+        serializer.save(note=note)
+@receiver(post_save, sender=Attendance)
+def actualizar_attendance(sender, instance, **kwargs):
+    if instance.note:
+        # Obtener todas las asistencias asociadas a esa nota
+        attendances = Attendance.objects.filter(note=instance.note)
+        total = 0
+        for att in attendances:
+            total += 100 if att.its_here else 0
+
+        promedio = total / attendances.count() if attendances.exists() else 0
+        instance.note.note_Attendance = round(promedio, 2)
+        instance.note.save()
+        
+        calcular_promedio_final(instance.note)
+            
+
+class TaskViewSet(viewsets.ModelViewSet):
+    serializer_class = TaskSerializer
+    queryset = Task.objects.all()
+
+    def perform_create(self, serializer):
+        degree_subject = self.request.data.get('degreeSubject')
+        if not degree_subject:
+            raise serializers.ValidationError("Debe enviar degreeSubject")
+
+        try:
+            ds = DegreeSubject.objects.get(id=degree_subject)
+        except DegreeSubject.DoesNotExist:
+            raise serializers.ValidationError("DegreeSubject inválido")
+
+        quetar = Quetar.getQuetar()
+        note = Notes.objects.filter(degreeSubject=ds, quetar=quetar).first()
+        if not note:
+            raise serializers.ValidationError("No se encontró Note para esa combinación")
+
+        serializer.save(note=note)
+@receiver(post_save, sender=Task)
+def actualizar_task(sender, instance, **kwargs):
+    if instance.note:
+        # Obtener todas las tareas asociadas a esa nota
+        tasks = Task.objects.filter(note=instance.note)
+        total = 0
+        for t in tasks:
+            total += t.value
+
+        promedio = total / tasks.count() if tasks.exists() else 0
+
+        instance.note.note_Task = round(promedio, 2)
+        instance.note.save()
+        calcular_promedio_final(instance.note)
+
+            
+        
+        
+class ExamViewSet(viewsets.ModelViewSet):
+    serializer_class = ExamSerializer
+    queryset = Exam.objects.all()
+
+    def perform_create(self, serializer):
+        degree_subject = self.request.data.get('degreeSubject')
+        if not degree_subject:
+            raise serializers.ValidationError("Debe enviar degreeSubject")
+
+        try:
+            ds = DegreeSubject.objects.get(id=degree_subject)
+        except DegreeSubject.DoesNotExist:
+            raise serializers.ValidationError("DegreeSubject inválido")
+
+        quetar = Quetar.getQuetar()
+        note = Notes.objects.filter(degreeSubject=ds, quetar=quetar).first()
+        if not note:
+            raise serializers.ValidationError("No se encontró Note para esa combinación")
+
+        serializer.save(note=note)
+@receiver(post_save, sender=Exam)
+def actualizar_exam(sender, instance, **kwargs):
+    if instance.note:
+        exams = Exam.objects.filter(note=instance.note)
+        total = 0
+        for e in exams:
+            total += e.value
+
+        promedio = total / exams.count() if exams.exists() else 0
+
+        instance.note.note_Exam = round(promedio, 2)
+        instance.note.save()
+        calcular_promedio_final(instance.note)
+
+        
+class ParticipationViewSet(viewsets.ModelViewSet):
+    serializer_class = ParticipationSerializer
+    queryset = Participation.objects.all()
+
+    def perform_create(self, serializer):
+        degree_subject = self.request.data.get('degreeSubject')
+        if not degree_subject:
+            raise serializers.ValidationError("Debe enviar degreeSubject")
+
+        try:
+            ds = DegreeSubject.objects.get(id=degree_subject)
+        except DegreeSubject.DoesNotExist:
+            raise serializers.ValidationError("DegreeSubject inválido")
+
+        quetar = Quetar.getQuetar()
+        note = Notes.objects.filter(degreeSubject=ds, quetar=quetar).first()
+        if not note:
+            raise serializers.ValidationError("No se encontró Note para esa combinación")
+
+        serializer.save(note=note)
+@receiver(post_save, sender=Participation)
+def actualizar_participation(sender, instance, **kwargs):
+    if instance.note:
+        participations = Participation.objects.filter(note=instance.note)
+        total = 0
+        for p in participations:
+            total += p.value
+
+        promedio = total / participations.count() if participations.exists() else 0
+
+        instance.note.note_Participation = round(promedio, 2)
+        instance.note.save()
+        calcular_promedio_final(instance.note)
+
+
     
                      
-class TareaUrlViewSet(viewsets.ModelViewSet):
-    queryset = TareaUrl.objects.all()
-    serializer_class = TareaUrlSerializer
 
 
 class NotesViewSet(viewsets.ModelViewSet):
     queryset = Notes.objects.all()
     serializer_class = NotesSerializer
+    
+def calcular_promedio_final(note):
+    note.note = (
+        note.note_Task * 0.15 +
+        note.note_Exam * 0.60 +
+        note.note_Participation * 0.10 +
+        note.note_Attendance * 0.15
+    )
