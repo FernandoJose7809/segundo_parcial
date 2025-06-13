@@ -15,7 +15,6 @@
         <th>Género</th>
         <th>Email</th> <!-- Volver a mostrar el email -->
         <th>Tel. Estudiante</th>
-        <th>Tel. Padre</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -27,7 +26,6 @@
         <td>{{ s.gender }}</td>
         <td>{{ s.student_email }}</td> <!-- Mostrar email aquí -->
         <td>{{ s.student_phone }}</td>
-        <td>{{ s.parent_phone }}</td>
         <td>
           <button class="btn btn-danger btn-sm" (click)="deleteStudent(s.id!)">Eliminar</button>
         </td>
@@ -74,10 +72,6 @@
       <div class="mb-2">
         <label class="form-label">Tel. Estudiante:</label>
         <input class="form-control" [(ngModel)]="newStudent.student_phone" name="student_phone" />
-      </div>
-      <div class="mb-2">
-        <label class="form-label">Tel. Padre:</label>
-        <input class="form-control" [(ngModel)]="newStudent.parent_phone" name="parent_phone" required />
       </div>
       <div class="mb-2">
         <label class="form-label">Dirección:</label>

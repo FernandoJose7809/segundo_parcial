@@ -12,7 +12,6 @@ export interface Student {
   gender: string;
   address?: string;
   student_phone?: string;
-  parent_phone: string;
   student_email: string;
   created_year?: number;
   user?: number | null;
@@ -60,7 +59,6 @@ export class AlumnosComponent {
       gender: 'M',
       address: '',
       student_phone: '',
-      parent_phone: '',
       student_email: '',
       user: null
     };
