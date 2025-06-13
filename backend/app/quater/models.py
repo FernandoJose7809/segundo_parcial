@@ -73,36 +73,65 @@ class Notes(models.Model):
         return result
     
     
-class FollowUp(models.Model):
-    type=models.CharField(max_length=1,choices=type_choices)
-    note_value=models.DecimalField(max_digits=5,decimal_places=2,default=0)
-    student=models.ForeignKey(Student,on_delete=models.SET_NULL,blank=True,null=True)
-    degreeSubject=models.ForeignKey('grades.DegreeSubject', on_delete=models.CASCADE)
+# class FollowUp(models.Model):
+#     type=models.CharField(max_length=1,choices=type_choices)
+#     note_value=models.DecimalField(max_digits=5,decimal_places=2,default=0)
+#     student=models.ForeignKey(Student,on_delete=models.SET_NULL,blank=True,null=True)
+#     degreeSubject=models.ForeignKey('grades.DegreeSubject', on_delete=models.CASCADE)
+#     note= models.ForeignKey(Notes,on_delete=models.CASCADE, blank=True, null=True)
+
+# @receiver([post_save, post_delete], sender=FollowUp)
+# def update_averages_on_followup_change(sender, instance, **kwargs):
+#     from app.grades.models import DegreeSubject
+#     degree_subject = instance.degreeSubject
+#     grade = degree_subject.grade
+
+#     followups = FollowUp.objects.filter(degreeSubject=degree_subject)
+#     if followups.exists():
+#         # Promedio de todas las notas (no solo exámenes)
+#         degree_subject.average_Participation = followups.filter(type='P').aggregate(avg=Avg('note_value'))['avg'] or 0
+#         degree_subject.average_attendance = followups.filter(type='A').aggregate(avg=Avg('note_value'))['avg'] or 0
+#         degree_subject.average_tasks = followups.filter(type='T').aggregate(avg=Avg('note_value'))['avg'] or 0
+#         degree_subject.average_exam = followups.filter(type='E').aggregate(avg=Avg('note_value'))['avg'] or 0
+#         degree_subject.average_Note = followups.aggregate(avg=Avg('note'))['avg'] or 0
+#         degree_subject.save()
+
+#     all_degree_subjects = DegreeSubject.objects.filter(grade=grade)
+#     if all_degree_subjects.exists():
+#         grade.average_annual_grade = all_degree_subjects.aggregate(avg=Avg('average_Note'))['avg'] or 0
+#         grade.average_annual_attendance = all_degree_subjects.aggregate(avg=Avg('average_attendance'))['avg'] or 0
+#         grade.save()
+        
+class Attendance(models.Model):
+    its_here = models.BooleanField(default=False)
+    #student = models.ForeignKey(Student, on_delete=models.CASCADE,blank=True,null=True)
+    #degreeSubject=models.ForeignKey('grades.DegreeSubject', on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
     note= models.ForeignKey(Notes,on_delete=models.CASCADE, blank=True, null=True)
+    
+class Task(models.Model):
+    value = models.SmallIntegerField(default=0,blank=True)
+    #student = models.ForeignKey(Student, on_delete=models.CASCADE,blank=True,null=True)
+    #degreeSubject=models.ForeignKey('grades.DegreeSubject', on_delete=models.CASCADE)
+    start_date = models.DateField(auto_now_add=True)
+    note= models.ForeignKey(Notes,on_delete=models.CASCADE, blank=True, null=True)
+    end_date = models.DateField()
 
-@receiver([post_save, post_delete], sender=FollowUp)
-def update_averages_on_followup_change(sender, instance, **kwargs):
-    from app.grades.models import DegreeSubject
-    degree_subject = instance.degreeSubject
-    grade = degree_subject.grade
-
-    followups = FollowUp.objects.filter(degreeSubject=degree_subject)
-    if followups.exists():
-        # Promedio de todas las notas (no solo exámenes)
-        degree_subject.average_Participation = followups.filter(type='P').aggregate(avg=Avg('note'))['avg'] or 0
-        degree_subject.average_attendance = followups.filter(type='A').aggregate(avg=Avg('note'))['avg'] or 0
-        degree_subject.average_tasks = followups.filter(type='T').aggregate(avg=Avg('note'))['avg'] or 0
-        degree_subject.average_exam = followups.filter(type='E').aggregate(avg=Avg('note'))['avg'] or 0
-        degree_subject.average_Note = followups.aggregate(avg=Avg('note'))['avg'] or 0
-        degree_subject.save()
-
-    all_degree_subjects = DegreeSubject.objects.filter(grade=grade)
-    if all_degree_subjects.exists():
-        grade.average_annual_grade = all_degree_subjects.aggregate(avg=Avg('average_Note'))['avg'] or 0
-        grade.average_annual_attendance = all_degree_subjects.aggregate(avg=Avg('average_attendance'))['avg'] or 0
-        grade.save()
+class Participation(models.Model):
+    value = models.SmallIntegerField(default=0,blank=True)
+    #student = models.ForeignKey(Student, on_delete=models.CASCADE,blank=True,null=True)
+    #degreeSubject=models.ForeignKey('grades.DegreeSubject', on_delete=models.CASCADE)
+    note= models.ForeignKey(Notes,on_delete=models.CASCADE, blank=True, null=True)
+    
+class Exam(models.Model):
+    value = models.SmallIntegerField(default=0,blank=True)
+    #student = models.ForeignKey(Student, on_delete=models.CASCADE,blank=True,null=True)
+    #degreeSubject=models.ForeignKey('grades.DegreeSubject', on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    note= models.ForeignKey(Notes,on_delete=models.CASCADE, blank=True, null=True)
+    
+    
         
 class TareaUrl(models.Model):
     url = models.URLField(blank=True,null=True)
-    followUp = models.ForeignKey(FollowUp,on_delete=models.CASCADE)
-    end_date= models.DateField()
+    task = models.ForeignKey(Task,on_delete=models.CASCADE)

@@ -4,7 +4,8 @@ import {
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { API_BASE_URL } from './api.service';
+///import { API_BASE_URL } from './api.service';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -28,7 +29,7 @@ export class AuthInterceptor implements HttpInterceptor {
           !req.url.includes('token/refresh')
         ) {
           console.log('Intentando refrescar el token...');
-          return this.http.post<any>(`${API_BASE_URL}token/refresh/`, {
+          return this.http.post<any>(`${environment.apiBaseUrl}token/refresh/`, {
             refresh: localStorage.getItem('refresh_token')
           }).pipe(
             switchMap((data) => {
