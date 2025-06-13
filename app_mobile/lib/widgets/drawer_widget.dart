@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routes/app_routes.dart';
+import '../services/api.dart';
+import 'dart:convert';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
@@ -11,24 +13,40 @@ class DrawerWidget extends StatefulWidget {
 
 class _DrawerWidgetState extends State<DrawerWidget> {
   bool logueado = false;
-  String nombreUsuario = '';
-  bool cargandoNombre = true;
+  bool cargandoPerfil = true;
+  Map<String, dynamic>? perfil;
 
   @override
   void initState() {
     super.initState();
-    verificarLogin();
+    cargarPerfil();
   }
 
-  Future<void> verificarLogin() async {
+  Future<void> cargarPerfil() async {
     final prefs = await SharedPreferences.getInstance();
     final isLogged = prefs.getString('access') != null;
-    final cachedName = prefs.getString('user_name');
+    final studentId = prefs.getInt('student_id');
+    final access = prefs.getString('access');
 
+    if (isLogged && studentId != null && access != null) {
+      final api = ApiService();
+      final response = await api.get(
+        'Estudiantes/$studentId/',
+        headers: {'Authorization': 'Bearer $access'},
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          perfil = jsonDecode(response.body);
+          logueado = true;
+          cargandoPerfil = false;
+        });
+        return;
+      }
+    }
     setState(() {
-      logueado = isLogged;
-      nombreUsuario = cachedName ?? '';
-      cargandoNombre = false;
+      logueado = false;
+      cargandoPerfil = false;
+      perfil = null;
     });
   }
 
@@ -46,72 +64,53 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               vertical: widthScreen * 0.08,
             ),
             width: double.infinity,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Icon(Icons.person_outline,
-                    size: 40, color: Colors.indigo),
-                SizedBox(width: widthScreen * 0.03),
-                Expanded(
-                  child: cargandoNombre
-                      ? const Text(
-                          'Cargando...',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.black45,
+            child: cargandoPerfil
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : perfil != null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.person_outline,
+                                  size: 40, color: Colors.indigo),
+                              SizedBox(width: widthScreen * 0.03),
+                              Expanded(
+                                child: Text(
+                                  '${perfil?['first_name'] ?? ''} ${perfil?['last_name'] ?? ''}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: Colors.black87,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
-                        )
-                      : Text(
-                          logueado ? nombreUsuario : 'Bienvenido',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.black87,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                          const SizedBox(height: 12),
+                          Text('Dirección: ${perfil?['address'] ?? ''}',
+                              style: const TextStyle(fontSize: 15)),
+                          const SizedBox(height: 6),
+                          Text('Teléfono: ${perfil?['student_phone'] ?? ''}',
+                              style: const TextStyle(fontSize: 15)),
+                          const SizedBox(height: 6),
+                          Text('Correo: ${perfil?['student_email'] ?? ''}',
+                              style: const TextStyle(fontSize: 15)),
+                        ],
+                      )
+                    : const Text(
+                        'No se pudo cargar el perfil',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.redAccent,
                         ),
-                ),
-              ],
-            ),
+                      ),
           ),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                if (logueado) ...[
-                  ListTile(
-                    leading: const Icon(Icons.person),
-                    title: const Text('Perfil'),
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.perfil);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.book),
-                    title: const Text('Materias'),
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.materias);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.grade),
-                    title: const Text('Notas'),
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.notas);
-                    },
-                  ),
-                ],
-                ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: const Text('Configuración'),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          ),
+          const Spacer(),
           const Divider(),
           Padding(
             padding: EdgeInsets.symmetric(
@@ -135,6 +134,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   await prefs.remove('access');
                   await prefs.remove('refresh');
                   await prefs.remove('user_name');
+                  await prefs.remove('student_id');
 
                   if (!context.mounted) return;
 

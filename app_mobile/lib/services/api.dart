@@ -1,35 +1,57 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:app_mobile/config/constants.dart'; // Importa la constante
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_mobile/config/constants.dart';
 
 class ApiService {
-  static const String apiUrl = apiBaseUrl; // Usa la constante importada
+  static const String apiUrl = apiBaseUrl;
 
-  Future<http.Response> get(String endpoint) async {
+  Future<http.Response> get(String endpoint,
+      {Map<String, String>? headers}) async {
     final url = Uri.parse(apiUrl + endpoint);
-    return await http.get(url);
+    final response = await http.get(url, headers: headers);
+    if (response.statusCode == 401) {
+      // Intentar refrescar el token
+      final newAccess = await _refreshToken();
+      if (newAccess != null && headers != null) {
+        headers['Authorization'] = 'Bearer $newAccess';
+        return await http.get(url, headers: headers);
+      }
+    }
+    return response;
   }
 
-  Future<http.Response> post(String endpoint, Map<String, dynamic> data) async {
+  Future<http.Response> post(String endpoint, Map<String, dynamic> data,
+      {Map<String, String>? headers}) async {
     final url = Uri.parse(apiUrl + endpoint);
+    final defaultHeaders = {
+      'Content-Type': 'application/json',
+      if (headers != null) ...headers,
+    };
     return await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: defaultHeaders,
       body: jsonEncode(data),
     );
   }
 
-  Future<http.Response> put(String endpoint, Map<String, dynamic> data) async {
-    final url = Uri.parse(apiUrl + endpoint);
-    return await http.put(
+  Future<String?> _refreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final refresh = prefs.getString('refresh');
+    if (refresh == null) return null;
+
+    final url = Uri.parse('${apiUrl}token/refresh/');
+    final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),
+      body: jsonEncode({'refresh': refresh}),
     );
-  }
-
-  Future<http.Response> delete(String endpoint) async {
-    final url = Uri.parse(apiUrl + endpoint);
-    return await http.delete(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final newAccess = data['access'];
+      await prefs.setString('access', newAccess);
+      return newAccess;
+    }
+    return null;
   }
 }

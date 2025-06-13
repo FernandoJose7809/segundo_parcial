@@ -20,10 +20,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       initialRoute: AppRoutes.login,
-      routes: {
-        AppRoutes.login: (context) => const LoginScreen(),
-        AppRoutes.home: (context) => const HomeScreen(),
-      },
+      routes: AppRoutes.routes,
     );
   }
 }

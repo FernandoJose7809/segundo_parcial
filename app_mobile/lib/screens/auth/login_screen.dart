@@ -37,10 +37,22 @@ class _LoginScreenState extends State<LoginScreen> {
         final access = data['access'];
         final refresh = data['refresh'];
 
-        // Aquí puedes guardar los tokens en SharedPreferences si lo deseas
+        // Guardar los tokens
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('access', access);
         await prefs.setString('refresh', refresh);
+
+        // Obtener el ID del estudiante usando el token de acceso
+        final userResponse = await api.get(
+          'Estudiantes/me/', // Ajusta la ruta según tu API
+          headers: {'Authorization': 'Bearer $access'},
+        );
+
+        if (userResponse.statusCode == 200) {
+          final userData = jsonDecode(userResponse.body);
+          final studentId = userData['id'];
+          await prefs.setInt('student_id', studentId);
+        }
 
         setState(() {
           _isLoading = false;

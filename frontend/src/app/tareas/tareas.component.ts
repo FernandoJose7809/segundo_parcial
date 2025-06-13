@@ -5,11 +5,11 @@ import { ApiService } from '../services/api.service';
 
 interface Tarea {
   id?: number;
-  note: number;
-  student: number | null;
+  value: number;
+  end_date: string;
   degreeSubject: number | null;
-  quetar: number | null;
-  type: string; // Siempre "T"
+  url: string; // <-- Agrega esta línea
+  note?: number;
 }
 
 interface Student {
@@ -47,6 +47,7 @@ export class TareasComponent {
   degreeSubjects: DegreeSubject[] = [];
   subjects: Subject[] = [];
   quetars: Quetar[] = [];
+  notas: any[] = []; // Asegúrate de cargar las notas
   showModal = false;
   editMode = false;
   loading = false;
@@ -58,23 +59,24 @@ export class TareasComponent {
     this.loadDegreeSubjects();
     this.loadSubjects();
     this.loadQuetars();
+    this.loadNotas();
   }
 
   getEmptyTarea(): Tarea {
     return {
-      note: 0,
-      student: null,
+      value: 0,
+      end_date: '',
       degreeSubject: null,
-      quetar: null,
-      type: 'T'
+      url: '', // <-- Agrega esta línea
+      note: 0
     };
   }
 
   loadTareas() {
     this.loading = true;
-    this.apiService.get('TrimestreDelEsudiante/').subscribe({
+    this.apiService.get('Tarea/').subscribe({
       next: (data) => {
-        this.tareas = data.filter((t: Tarea) => t.type === 'T');
+        this.tareas = data;
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -106,6 +108,12 @@ export class TareasComponent {
   loadQuetars() {
     this.apiService.get('Trimestre/').subscribe({
       next: (data: any) => { this.quetars = data; }
+    });
+  }
+
+  loadNotas() {
+    this.apiService.get('Notas/').subscribe({
+      next: (data) => { this.notas = data; }
     });
   }
 
@@ -143,14 +151,14 @@ export class TareasComponent {
 
   saveTarea() {
     if (this.editMode && this.newTarea.id) {
-      this.apiService.put(`TrimestreDelEsudiante/${this.newTarea.id}/`, this.newTarea).subscribe({
+      this.apiService.put(`Tarea/${this.newTarea.id}/`, this.newTarea).subscribe({
         next: () => {
           this.loadTareas();
           this.closeModal();
         }
       });
     } else {
-      this.apiService.post('TrimestreDelEsudiante/', this.newTarea).subscribe({
+      this.apiService.post('Tarea/', this.newTarea).subscribe({
         next: () => {
           this.loadTareas();
           this.closeModal();
@@ -161,7 +169,30 @@ export class TareasComponent {
 
   deleteTarea(id: number) {
     if (confirm('¿Seguro que deseas eliminar esta tarea?')) {
-      this.apiService.delete(`TrimestreDelEsudiante/${id}/`).subscribe(() => this.loadTareas());
+      this.apiService.delete(`Tarea/${id}/`).subscribe(() => this.loadTareas());
     }
+  }
+
+  getStudentNameFromNote(noteId: number | undefined) {
+    const note = this.notas.find(n => n.id === noteId);
+    if (!note) return '';
+    const est = this.estudiantes.find(e => e.id === note.student);
+    return est ? `${est.first_name} ${est.last_name}` : '';
+  }
+
+  getSubjectNameFromNote(noteId: number | undefined) {
+    const note = this.notas.find(n => n.id === noteId);
+    if (!note) return '';
+    const ds = this.degreeSubjects.find(d => d.id === note.degreeSubject);
+    if (!ds) return '';
+    const subject = this.subjects.find(s => s.id === ds.subject);
+    return subject ? subject.name : '';
+  }
+
+  getQuetarDescriptionFromNote(noteId: number | undefined) {
+    const note = this.notas.find(n => n.id === noteId);
+    if (!note) return '';
+    const q = this.quetars.find(qt => qt.id === note.quetar);
+    return q ? q.description : '';
   }
 }

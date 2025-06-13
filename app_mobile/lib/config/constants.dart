@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 // ✅ API BASE URL
 const String apiBaseUrl =
-    'http://10.0.2.2:8000/api/'; // Para pruebas en emulador android
-
+    // 'http://10.0.2.2:8000/api/'; // Para pruebas en emulador android
+    'http://143.198.147.83:8000/api/';
 /* const String apiBaseUrl =
     'http://192.168.0.18:8000/api'; */ // para pruebas en celular
 

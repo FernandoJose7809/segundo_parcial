@@ -13,9 +13,9 @@
     </thead>
     <tbody>
       <tr *ngFor="let t of tareas">
-        <td>{{ getStudentName(t.student) }}</td>
-        <td>{{ getSubjectName(t.degreeSubject) }}</td>
-        <td>{{ getQuetarDescription(t.quetar) }}</td>
+        <td>{{ getStudentNameFromNote(t.note) }}</td>
+        <td>{{ getSubjectNameFromNote(t.note) }}</td>
+        <td>{{ getQuetarDescriptionFromNote(t.note) }}</td>
         <td>{{ t.note }}</td>
         <td>
           <button class="btn btn-warning btn-sm me-2" (click)="openModal(t)">Editar</button>
@@ -35,15 +35,6 @@
     <h3 class="mb-3">{{ editMode ? 'Editar' : 'Agregar' }} tarea</h3>
     <form (ngSubmit)="saveTarea()" #tareaForm="ngForm">
       <div class="mb-2">
-        <label class="form-label">Estudiante:</label>
-        <select class="form-select" [(ngModel)]="newTarea.student" name="student" required>
-          <option [ngValue]="null" disabled selected>Selecciona un estudiante</option>
-          <option *ngFor="let est of estudiantes" [ngValue]="est.id">
-            {{ est.first_name }} {{ est.last_name }}
-          </option>
-        </select>
-      </div>
-      <div class="mb-2">
         <label class="form-label">Materia:</label>
         <select class="form-select" [(ngModel)]="newTarea.degreeSubject" name="degreeSubject" required>
           <option [ngValue]="null" disabled selected>Selecciona una materia</option>
@@ -53,17 +44,20 @@
         </select>
       </div>
       <div class="mb-2">
-        <label class="form-label">Trimestre:</label>
-        <select class="form-select" [(ngModel)]="newTarea.quetar" name="quetar" required>
-          <option [ngValue]="null" disabled selected>Selecciona un trimestre</option>
-          <option *ngFor="let q of quetars" [ngValue]="q.id">
-            {{ q.description }}
-          </option>
-        </select>
+        <label class="form-label">Nota (ID de nota):</label>
+        <input class="form-control" type="number" [(ngModel)]="newTarea.note" name="note" required />
       </div>
       <div class="mb-2">
-        <label class="form-label">Nota:</label>
-        <input class="form-control" type="number" [(ngModel)]="newTarea.note" name="note" required />
+        <label class="form-label">Valor:</label>
+        <input class="form-control" type="number" [(ngModel)]="newTarea.value" name="value" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Fecha de entrega:</label>
+        <input class="form-control" type="date" [(ngModel)]="newTarea.end_date" name="end_date" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">URL:</label>
+        <input class="form-control" type="text" [(ngModel)]="newTarea.url" name="url" />
       </div>
       <div class="d-flex justify-content-between mt-3">
         <button type="submit" class="btn btn-success" [disabled]="tareaForm.invalid">Guardar</button>

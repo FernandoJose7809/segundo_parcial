@@ -1,15 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../services/api.service';
 
 interface Asistencia {
   id?: number;
-  note_value: number;
-  student: number | null;
-  degreeSubject: number | null;
-  quetar: number | null; // <-- Agregado
-  type: string; // Siempre "A"
+  its_here: boolean;
+  date?: string;
+  note: number | null; // Cambia degreeSubject por note
 }
 
 interface Student {
@@ -42,16 +40,20 @@ interface Quetar {
   templateUrl: './asistencia.component.html',
   styleUrls: ['./asistencia.component.css']
 })
-export class AsistenciaComponent {
+export class AsistenciaComponent implements OnInit {
   asistencias: Asistencia[] = [];
   estudiantes: Student[] = [];
   degreeSubjects: DegreeSubject[] = [];
   subjects: Subject[] = [];
   quetars: Quetar[] = [];
+  notas: any[] = [];
   showModal = false;
   editMode = false;
   loading = false;
   newAsistencia: Asistencia = this.getEmptyAsistencia();
+  selectedStudent: number | null = null;
+  selectedDegreeSubject: number | null = null;
+  selectedQuetar: number | null = null;
 
   constructor(private apiService: ApiService) {
     this.loadAsistencias();
@@ -61,12 +63,15 @@ export class AsistenciaComponent {
     this.loadQuetars();
   }
 
+  ngOnInit() {
+    this.loadNotas();
+  }
+
   loadAsistencias() {
     this.loading = true;
-    this.apiService.get('TrimestreDelEsudiante/').subscribe({
+    this.apiService.get('Asitencia/').subscribe({
       next: (data) => {
-        // Filtra solo asistencias
-        this.asistencias = data.filter((a: Asistencia) => a.type === 'A');
+        this.asistencias = data;
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -101,6 +106,12 @@ export class AsistenciaComponent {
     });
   }
 
+  loadNotas() {
+    this.apiService.get('Notas/').subscribe({
+      next: (data) => { this.notas = data; }
+    });
+  }
+
   openModal(asistencia?: Asistencia) {
     if (asistencia) {
       this.newAsistencia = { ...asistencia };
@@ -118,24 +129,32 @@ export class AsistenciaComponent {
 
   getEmptyAsistencia(): Asistencia {
     return {
-      note_value: 0,
-      student: null,
-      degreeSubject: null,
-      quetar: null, // <-- Agregado
-      type: 'A'
+      its_here: false,
+      note: null
     };
   }
 
   saveAsistencia() {
+    console.log('Estudiante:', this.selectedStudent, 'Materia:', this.selectedDegreeSubject, 'Trimestre:', this.selectedQuetar);
+
+    const noteId = this.findNoteId();
+    if (!noteId) {
+      alert('No se encontró la nota para la combinación seleccionada.');
+      return;
+    }
+    const payload = {
+      its_here: this.newAsistencia.its_here,
+      note: noteId
+    };
     if (this.editMode && this.newAsistencia.id) {
-      this.apiService.put(`TrimestreDelEsudiante/${this.newAsistencia.id}/`, this.newAsistencia).subscribe({
+      this.apiService.put(`Asitencia/${this.newAsistencia.id}/`, payload).subscribe({
         next: () => {
           this.loadAsistencias();
           this.closeModal();
         }
       });
     } else {
-      this.apiService.post('TrimestreDelEsudiante/', this.newAsistencia).subscribe({
+      this.apiService.post('Asitencia/', payload).subscribe({
         next: () => {
           this.loadAsistencias();
           this.closeModal();
@@ -146,7 +165,7 @@ export class AsistenciaComponent {
 
   deleteAsistencia(id: number) {
     if (confirm('¿Seguro que deseas eliminar esta asistencia?')) {
-      this.apiService.delete(`TrimestreDelEsudiante/${id}/`).subscribe(() => this.loadAsistencias());
+      this.apiService.delete(`Asitencia/${id}/`).subscribe(() => this.loadAsistencias());
     }
   }
 
@@ -165,5 +184,37 @@ export class AsistenciaComponent {
   getStudentFullName(studentId: number | null): string {
     const est = this.estudiantes.find(e => e.id === studentId);
     return est ? `${est.first_name} ${est.last_name}` : '';
+  }
+
+  findNoteId(): number | null {
+    const note = this.notas.find(n =>
+      n.degreeSubject === this.selectedDegreeSubject &&
+      n.quetar === this.selectedQuetar &&
+      n.student === this.selectedStudent
+    );
+    return note ? note.id : null;
+  }
+
+  getStudentNameFromNote(noteId: number | null): string {
+    const note = this.notas.find(n => n.id === noteId);
+    if (!note) return '';
+    const student = this.estudiantes.find(e => e.id === note.student);
+    return student ? `${student.first_name} ${student.last_name}` : '';
+  }
+
+  getSubjectNameFromNote(noteId: number | null): string {
+    const note = this.notas.find(n => n.id === noteId);
+    if (!note) return '';
+    const ds = this.degreeSubjects.find(d => d.id === note.degreeSubject);
+    if (!ds) return '';
+    const subject = this.subjects.find(s => s.id === ds.subject);
+    return subject ? subject.name : '';
+  }
+
+  getQuetarDescriptionFromNote(noteId: number | null): string {
+    const note = this.notas.find(n => n.id === noteId);
+    if (!note) return '';
+    const quetar = this.quetars.find(q => q.id === note.quetar);
+    return quetar ? quetar.description : '';
   }
 }

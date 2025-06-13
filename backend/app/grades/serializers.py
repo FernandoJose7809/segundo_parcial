@@ -22,7 +22,7 @@ class StudentCourseSerializer(serializers.ModelSerializer):
 class DegreeSubjectSerializer(serializers.ModelSerializer):
     grade = serializers.PrimaryKeyRelatedField(queryset=Grade.objects.all())
     subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), allow_null=True)
-
+    subject_name = serializers.CharField(source='subject.name', read_only=True)
     class Meta:
         model = DegreeSubject
         fields = '__all__'
