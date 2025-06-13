@@ -2,12 +2,6 @@
   <h2>Cursos</h2>
   <div class="mb-3 d-flex gap-2">
   <button class="btn btn-primary" (click)="openModal()">Agregar curso</button>
-  <a class="btn btn-outline-secondary" routerLink="/dashboard/grupos" href="/dashboard/grupos">
-    Grupos
-  </a>
-  <a class="btn btn-outline-secondary" routerLink="/dashboard/grupos_profesor" href="/dashboard/grupos_profesor">
-    Asignar Grupos a Profesores
-  </a>
 </div>
   <table class="table table-striped table-bordered" *ngIf="cursos.length > 0; else noData">
     <thead class="table-primary">
@@ -48,6 +42,10 @@
       <div class="mb-2">
         <label class="form-label">Año:</label>
         <input class="form-control" type="number" [(ngModel)]="newCurso.year" name="year" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Acrónimo:</label>
+        <input class="form-control" [(ngModel)]="newCurso.acronym" name="acronym" required />
       </div>
       <div class="d-flex justify-content-between mt-3">
         <button type="submit" class="btn btn-success" [disabled]="cursoForm.invalid">Guardar</button>

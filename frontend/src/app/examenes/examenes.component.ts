@@ -6,6 +6,7 @@ import { ApiService } from '../services/api.service';
 interface Examen {
   id?: number;
   note: number;
+  note_value: number; // <-- Agrega este campo
   student: number | null;
   degreeSubject: number | null;
   quetar: number | null;
@@ -63,6 +64,7 @@ export class ExamenesComponent {
   getEmptyExamen(): Examen {
     return {
       note: 0,
+      note_value: 0, // <-- Agregado
       student: null,
       degreeSubject: null,
       quetar: null,
@@ -142,21 +144,19 @@ export class ExamenesComponent {
   }
 
   saveExamen() {
-    if (this.editMode && this.newExamen.id) {
-      this.apiService.put(`TrimestreDelEsudiante/${this.newExamen.id}/`, this.newExamen).subscribe({
-        next: () => {
-          this.loadExamenes();
-          this.closeModal();
-        }
-      });
-    } else {
-      this.apiService.post('TrimestreDelEsudiante/', this.newExamen).subscribe({
-        next: () => {
-          this.loadExamenes();
-          this.closeModal();
-        }
-      });
-    }
+    this.newExamen.note_value = Number(this.newExamen.note);
+
+    // Crea una copia y cambia el nombre del campo
+    const examenToSend: any = { ...this.newExamen };
+    examenToSend.degreeSubject_id = examenToSend.degreeSubject;
+    delete examenToSend.degreeSubject; // Elimina el campo viejo
+
+    this.apiService.post('TrimestreDelEsudiante/', examenToSend).subscribe({
+      next: () => {
+        this.loadExamenes();
+        this.closeModal();
+      }
+    });
   }
 
   deleteExamen(id: number) {

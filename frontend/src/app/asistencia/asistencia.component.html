@@ -13,10 +13,10 @@
     </thead>
     <tbody>
       <tr *ngFor="let a of asistencias">
-        <td>{{ a.student }}</td>
+        <td>{{ getStudentFullName(a.student) }}</td>
         <td>{{ getSubjectName(a.degreeSubject) }}</td>
         <td>{{ getQuetarDescription(a.quetar) }}</td>
-        <td>{{ a.note }}</td>
+        <td>{{ a.note_value }}</td>
         <td>
           <button class="btn btn-warning btn-sm me-2" (click)="openModal(a)">Editar</button>
           <button class="btn btn-danger btn-sm" (click)="deleteAsistencia(a.id!)">Eliminar</button>
@@ -68,7 +68,7 @@
 
       <div class="mb-2">
         <label class="form-label">Nota:</label>
-        <input class="form-control" type="number" [(ngModel)]="newAsistencia.note" name="note" required />
+        <input class="form-control" type="number" [(ngModel)]="newAsistencia.note_value" name="note_value" required />
       </div>
       <div class="d-flex justify-content-between mt-3">
         <button type="submit" class="btn btn-success" [disabled]="asistenciaForm.invalid">Guardar</button>

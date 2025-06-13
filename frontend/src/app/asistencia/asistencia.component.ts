@@ -5,10 +5,10 @@ import { ApiService } from '../services/api.service';
 
 interface Asistencia {
   id?: number;
-  note: number;
+  note_value: number;
   student: number | null;
   degreeSubject: number | null;
-  quetar: number | null;
+  quetar: number | null; // <-- Agregado
   type: string; // Siempre "A"
 }
 
@@ -59,16 +59,6 @@ export class AsistenciaComponent {
     this.loadDegreeSubjects();
     this.loadSubjects();
     this.loadQuetars();
-  }
-
-  getEmptyAsistencia(): Asistencia {
-    return {
-      note: 0,
-      student: null,
-      degreeSubject: null,
-      quetar: null,
-      type: 'A'
-    };
   }
 
   loadAsistencias() {
@@ -126,6 +116,16 @@ export class AsistenciaComponent {
     this.showModal = false;
   }
 
+  getEmptyAsistencia(): Asistencia {
+    return {
+      note_value: 0,
+      student: null,
+      degreeSubject: null,
+      quetar: null, // <-- Agregado
+      type: 'A'
+    };
+  }
+
   saveAsistencia() {
     if (this.editMode && this.newAsistencia.id) {
       this.apiService.put(`TrimestreDelEsudiante/${this.newAsistencia.id}/`, this.newAsistencia).subscribe({
@@ -160,5 +160,10 @@ export class AsistenciaComponent {
   getQuetarDescription(quetarId: number | null) {
     const q = this.quetars.find(qt => qt.id === quetarId);
     return q ? q.description : '';
+  }
+
+  getStudentFullName(studentId: number | null): string {
+    const est = this.estudiantes.find(e => e.id === studentId);
+    return est ? `${est.first_name} ${est.last_name}` : '';
   }
 }

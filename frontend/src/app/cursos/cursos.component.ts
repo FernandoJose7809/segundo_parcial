@@ -8,6 +8,7 @@ interface Curso {
   id?: number;
   year: number;
   grade: string;
+  acronym: string; // <-- Agrega esta línea
   average_annual_grade?: number;
   average_annual_attendance?: number;
 }
@@ -32,7 +33,8 @@ export class CursosComponent {
   getEmptyCurso(): Curso {
     return {
       year: new Date().getFullYear(),
-      grade: ''
+      grade: '',
+      acronym: ''
     };
   }
 
@@ -40,8 +42,7 @@ export class CursosComponent {
     this.loading = true;
     this.apiService.get('Cursos/').subscribe({
       next: (data) => {
-        this.cursos = data.sort(
-          (a: Curso, b: Curso) => a.grade.localeCompare(b.grade)
+        this.cursos = data.sort((a: Curso, b: Curso) => a.grade.localeCompare(b.grade)
         );
         this.loading = false;
       },

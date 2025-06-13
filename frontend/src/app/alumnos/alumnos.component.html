@@ -41,9 +41,13 @@
 
 <!-- Modal para crear estudiante -->
 <div *ngIf="showModal" class="modal">
-  <div class="modal-content" style="max-width: 400px; width: 100%;">
+  <div class="modal-content" style="max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;">
     <h3 class="mb-3">Crear estudiante</h3>
     <form (ngSubmit)="createStudent()" #form="ngForm" class="form-grid">
+      <div class="mb-2">
+        <label class="form-label">Cédula de Identidad:</label>
+        <input class="form-control" type="number" [(ngModel)]="newStudent.ci" name="ci" required />
+      </div>
       <div class="mb-2">
         <label class="form-label">Nombre:</label>
         <input class="form-control" [(ngModel)]="newStudent.first_name" name="first_name" required />

@@ -5,6 +5,7 @@ import { ApiService } from '../services/api.service';
 
 interface Trimestre {
   id?: number;
+  queter: string; // o number, según tu backend
   description: string;
   start_date?: string;
   end_date?: string;
@@ -29,6 +30,7 @@ export class TrimestreComponent {
 
   getEmptyTrimestre(): Trimestre {
     return {
+      queter: '',
       description: '',
       start_date: '',
       end_date: ''

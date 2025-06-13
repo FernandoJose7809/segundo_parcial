@@ -4,6 +4,7 @@
   <table class="table table-striped table-bordered" *ngIf="trimestres.length > 0; else noData">
     <thead class="table-primary">
       <tr>
+        <th>#</th>
         <th>Descripción</th>
         <th>Fecha Inicio</th>
         <th>Fecha Fin</th>
@@ -12,6 +13,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let t of trimestres">
+        <td>{{ t.queter }}</td>
         <td>{{ t.description }}</td>
         <td>{{ t.start_date || '-' }}</td>
         <td>{{ t.end_date || '-' }}</td>
@@ -42,6 +44,10 @@
       <div class="mb-2">
         <label class="form-label">Fecha Fin:</label>
         <input class="form-control" type="date" [(ngModel)]="newTrimestre.end_date" name="end_date" />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Número de trimestre:</label>
+        <input class="form-control" type="text" [(ngModel)]="newTrimestre.queter" name="queter" required />
       </div>
       <div class="d-flex justify-content-between mt-3">
         <button type="submit" class="btn btn-success" [disabled]="trimestreForm.invalid">Guardar</button>

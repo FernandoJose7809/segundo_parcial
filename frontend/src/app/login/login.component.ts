@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms'; // <-- Agrega esto
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  username: string = ''; // Cambia 'email' por 'username'
+  username: string = ''; 
   password: string = '';
 
   constructor(private router: Router, private apiService: ApiService) {}

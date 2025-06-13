@@ -11,8 +11,6 @@ import { ParticipacionComponent } from './participacion/participacion.component'
 import { CursosComponent } from './cursos/cursos.component';
 import { MateriascursosComponent } from './materiascursos/materiascursos.component';
 import { MateriasprofesorComponent } from './materiasprofesor/materiasprofesor.component';
-import { GrupoComponent } from './grupo/grupo.component';
-import { GrupoprofesorComponent } from './grupoprofesor/grupoprofesor.component';
 import { TrimestreComponent } from './trimestre/trimestre.component';
 
 export const routes: Routes = [
@@ -31,8 +29,6 @@ export const routes: Routes = [
       { path: 'cursos', component: CursosComponent},
       { path: 'cursos_materias', component: MateriascursosComponent },
       { path: 'materias_profesor', component: MateriasprofesorComponent },
-      { path: 'grupos', component: GrupoComponent },
-      { path: 'grupos_profesor', component: GrupoprofesorComponent },
       { path: 'trimestre', component: TrimestreComponent },
     ],
   },

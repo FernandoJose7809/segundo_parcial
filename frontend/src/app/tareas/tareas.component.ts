@@ -93,19 +93,19 @@ export class TareasComponent {
 
   loadDegreeSubjects() {
     this.apiService.get('MateriaPorCurso/').subscribe({
-      next: (data) => { this.degreeSubjects = data; }
+      next: (data: any) => { this.degreeSubjects = data; }
     });
   }
 
   loadSubjects() {
     this.apiService.get('Materias/').subscribe({
-      next: (data) => { this.subjects = data; }
+      next: (data: any) => { this.subjects = data; }
     });
   }
 
   loadQuetars() {
     this.apiService.get('Trimestre/').subscribe({
-      next: (data) => { this.quetars = data; }
+      next: (data: any) => { this.quetars = data; }
     });
   }
 

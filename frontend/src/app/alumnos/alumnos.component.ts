@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../services/api.service';
 
-interface Student {
+export interface Student {
   id?: number;
+  ci: number;
   first_name: string;
   last_name: string;
   birthdate: string;
@@ -52,6 +53,7 @@ export class AlumnosComponent {
 
   getEmptyStudent(): Student {
     return {
+      ci: 0,
       first_name: '',
       last_name: '',
       birthdate: '',
@@ -63,10 +65,9 @@ export class AlumnosComponent {
       user: null
     };
   }
-
   loadCursosYDespuesEstudiantes() {
     this.apiService.get('Cursos/').subscribe({
-      next: (data: Curso[]) => {
+      next: (data: any) => {
         this.cursos = data;
         this.loadStudents(); // Ahora sí, los cursos ya están cargados
       }
